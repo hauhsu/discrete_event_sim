@@ -1,4 +1,4 @@
-#include "PRNG.h"
+#include "../src/PRNG.h"
 
 using namespace RandNumGen;
 

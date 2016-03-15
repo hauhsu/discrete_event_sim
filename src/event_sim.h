@@ -9,7 +9,7 @@ public:
 
   virtual void process() = 0;
   unsigned occuure_time() const {return m_occure_time;}
-  std::function<bool (Event*, Event*)>compare; 
+  static std::function<bool (const Event*, const Event*)> compare; 
 
 private:
   unsigned m_occure_time;
@@ -27,9 +27,9 @@ public:
 private:
   unsigned m_time;
   
-  std::priority_queue<
-    Event*, 
-    std::vector<Event*>, 
-    decltype(Event::compare)> m_event_queue;
+  std::priority_queue
+    <Event*, 
+     std::vector<Event*>, 
+     decltype(Event::compare)> m_event_queue;
 
 };
