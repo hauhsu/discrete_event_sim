@@ -58,7 +58,7 @@ class RandGen
 
     double rand_exp_distribuiton(const double lambda) {
       double r = rand();
-      std::cout << r << std::endl;
+      //std::cout << r << std::endl;
       return  (-1/lambda) * log(1 - r);
     }
 
