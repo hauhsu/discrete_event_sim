@@ -2,7 +2,6 @@
 #include <vector>
 #include <cmath>
 
-namespace RandNumGen{
 
 const int __a = 16807;
 const int __m = 2147483647;
@@ -149,4 +148,3 @@ double autocorrelation_test(std::vector<double> rand_nums, const int i, const in
   return Z0;
 }
 
-} //namespace: RandGen

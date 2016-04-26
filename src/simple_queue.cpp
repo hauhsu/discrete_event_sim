@@ -139,8 +139,8 @@ public:
 private:
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
-  RandNumGen::RandGen m_rand_gen;
-  RandNumGen::RandGen m_rand_gen2;
+  RandGen m_rand_gen;
+  RandGen m_rand_gen2;
   unsigned m_total_service_time;
 };
 
