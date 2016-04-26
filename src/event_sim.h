@@ -23,7 +23,12 @@ std::function<bool (const Event*, const Event*)> compare;
 class Simulator
 {
 public:
-  Simulator (): m_time(0), m_event_queue(compare){}
+  Simulator (unsigned sim_time): 
+    m_time(0), 
+    m_sim_time(sim_time),
+    m_event_queue(compare)
+  {}
+
   virtual ~Simulator () {}
 
   void run();
@@ -41,6 +46,7 @@ public:
 
 private:
   unsigned m_time;
+  unsigned m_sim_time;
   
   std::priority_queue
     <Event*, 

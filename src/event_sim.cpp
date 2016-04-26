@@ -7,8 +7,7 @@ compare =  [] (const Event* a, const Event* b) {
 
 void Simulator::run () {
 
-  while (! m_event_queue.empty ()) {
-
+  while (! m_event_queue.empty () and m_time < m_sim_time) {
     Event * next_event = m_event_queue.top ();
     m_event_queue.pop ();
     m_time = next_event->occuure_time();
