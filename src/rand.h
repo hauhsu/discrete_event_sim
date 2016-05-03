@@ -6,7 +6,7 @@
 const int __a = 16807;
 const int __m = 2147483647;
 
-unsigned __rand(unsigned seed)
+unsigned __get_next_seed(unsigned seed)
 {
   return  (__a * seed) % __m;
 }
@@ -19,7 +19,7 @@ class __RandStream
 
     unsigned get_next_seed() {
         for (int i = 0; i < m_interval; ++i) {
-          m_next_init_seed = __rand(m_next_init_seed);
+          m_next_init_seed = __get_next_seed(m_next_init_seed);
         }
         return m_next_init_seed;
     }
@@ -50,7 +50,7 @@ class RandGen
      
     double rand(){ 
       //return a rand num between 0 and 1
-      m_seed = __rand(m_seed);
+      m_seed = __get_next_seed(m_seed);
 
       return static_cast<double>(m_seed)  / __m;
     }

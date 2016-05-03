@@ -25,13 +25,18 @@ class Simulator
 public:
   Simulator (unsigned sim_time): 
     m_time(0), 
-    m_sim_time(sim_time),
+    m_max_sim_time(sim_time),
     m_event_queue(compare)
   {}
 
   virtual ~Simulator () {}
 
   void run();
+
+  virtual bool terminat() {
+    return (m_event_queue.empty()) or (m_time > m_max_sim_time);
+  }
+
   void add_event(Event *new_event) {
 
     m_event_queue.push(new_event);  
@@ -46,7 +51,7 @@ public:
 
 private:
   unsigned m_time;
-  unsigned m_sim_time;
+  unsigned m_max_sim_time;
   
   std::priority_queue
     <Event*, 
