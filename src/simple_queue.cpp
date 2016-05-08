@@ -3,6 +3,7 @@
 unsigned Person::m_cnt = 0;
 
 
+unsigned inter_arrival_time_lambda;
 
 //
 // SimpleQueueSim definitions
@@ -10,7 +11,7 @@ unsigned Person::m_cnt = 0;
 void SimpleQueueSim::gen_arrival_event(const int num_event)
 {
   for (int i = 0; i < num_event; ++i) {
-    unsigned arrival_time = m_rand_arrival_time.rand_exp_distribuiton(5) * 100 + current_time();
+    unsigned arrival_time = m_rand_arrival_time.rand_exp_distribuiton(inter_arrival_time_lambda) * 100 + current_time();
     add_event(new ArriveEvent(arrival_time, *this)); 
   }
 }

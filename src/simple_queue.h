@@ -8,6 +8,7 @@
 #include "rand.h"
 #include "event_sim.h"
 
+extern unsigned inter_arrival_time_lambda;
 class Person
 {
   public:
@@ -67,7 +68,7 @@ class Person
 class SimpleQueueSim: public Simulator
 {
 public:
-  SimpleQueueSim (unsigned sim_time = 1000, int queue_depth=20): 
+  SimpleQueueSim (unsigned sim_time = 1000000, int queue_depth=20): 
     Simulator(sim_time),
     m_queue_depth(queue_depth){
     gen_arrival_event(5);
@@ -89,6 +90,9 @@ public:
     m_rand_arrival_time.seed(seed);
   }
 
+  unsigned get_seed() {
+    return m_rand_arrival_time.get_seed();
+  }
 
   virtual bool terminat() {
     return Simulator::terminat() or  m_num_simulated_person >= m_max_people;
@@ -176,5 +180,6 @@ private:
   unsigned m_num_simulated_person;
 
   std::ofstream person_sys_time;
+
 
 };
