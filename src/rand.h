@@ -51,7 +51,6 @@ class RandGen
     RandGen(int seed=1): m_seed(seed){}
      
     double rand(){ 
-      //return a rand num between 0 and 1
       m_seed = __get_next_seed(m_seed);
 
       return static_cast<double>(m_seed)  / __m;
@@ -59,7 +58,7 @@ class RandGen
 
     double rand_exp_distribuiton(const double lambda) {
       double r = rand();
-      return  (-1/lambda) * log(1 - r);
+      return  (-1.0/lambda) * log(1 - r);
     }
 
     void seed(int s) {

@@ -1,76 +1,99 @@
 from scipy.stats import t
 from subprocess import call
+from statistics import mean, stdev, variance
+import matplotlib.pyplot as plt
 
-
-def run_mm1(interarrival_time_lambda):
-    with open('next_seed.txt') as seed_file:
+interarrival_time_lambda = 0.2
+def run_mm1():
+    global interarrival_time_lambda
+    try:
+        seed_file = open('next_seed.txt')
         seed = seed_file.readline()
 
-    call(['./a.out', '100', seed, interarrival_time_lambda])
+    except FileNotFoundError:
+        seed = '1'
 
 
+    devnull = open('/dev/null', 'w')
+    call(['./a.out', '30', seed, str(interarrival_time_lambda)],
+        stdout=devnull)
 
-def average(nums):
-    return sum(nums) / len(nums)
 
-def variance(nums):
-
-    if (len(nums) == 1):
-        return 0 
-
-    avg = average(nums)
-    tmp = [(num - avg) ** 2 for num in nums]
-
-    return  (sum(tmp) / (len(nums)-1))**0.5
-
-def run_1_replication(interarrival_time_lambda):
-    run_mm1(interarrival_time_lambda)
-    yi= []
+def get_sim_result():
+    yi = []
     with open('person_sys_time.txt') as p_sys_time_file:
         for line in p_sys_time_file:
-           yi.append(int(line)) 
-    yi_average = sum(yi) / len(yi) 
+           yi.append(float(line)) 
 
-    return yi_average
+    return yi
 
-def compute_ci(interarrival_time_lambda):
-    epsilon = 1
+def confidence_interval_half_width(data, confidence=0.95):
+    n = len(data)
+    standard_deviation = stdev(data)
+    avg = mean(data)
+
+    return t.interval(confidence, n-1)[1] * (standard_deviation / n**0.5)
+
+
+def ci_with_precision(l=0.2, confidence=0.95, precision=0.9):
+    global interarrival_time_lambda
+    interarrival_time_lambda = l
+    run_mm1()
+    data = get_sim_result()
+
+    Yi_average = mean(data)
+    Yi_variance = variance(data)
+    epsilon = confidence_interval_half_width(data, confidence) / mean(data)
     replication = 1
 
+    if  epsilon > (1-precision):
+        epsilon = 1
+        yi_average_list = [mean(data)]
 
-    yi_average_list = []
-    yi_average_list.append(run_1_replication(interarrival_time_lambda))
+        while epsilon > (1-precision):
+            run_mm1()
+            data = get_sim_result()
+            yi_average_list.append( mean(data) )
+            Yi_average = mean(yi_average_list)
+            Yi_variance = variance(yi_average_list)
 
-    while epsilon > 0.5:
-        
-        ## Across replications
-        yi_average_list.append(run_1_replication)
-        Yi_average = average(yi_average_list)
-        Yi_variance = variance(yi_average_list)
+            
+            epsilon = confidence_interval_half_width(yi_average_list)\
+                                                    / mean(yi_average_list)
+
+            replication += 1
+
+    print()
+    print( '----- Analysis -----')
+    print( 'sample mean: ', Yi_average )
+    print( 'sample variance: ', Yi_variance )
+    print( 'epsilon: ', epsilon)
+    print( 'replication: ', replication)
+    print( '--------------------')
 
 
-        alpha = 0.9 
-        t_interval = t.interval(alpha, len(Yi)-1)[1]
-        epsilon = (t_interval * variance / (replication ** 0.5)) / average
+    return Yi_average, epsilon
 
-        replication += 1
 
-    print
-    print '----- Analysis -----'
-    print 'sample mean: ', Yi_average 
-    print 'sample variance: ', Yi_variance 
-    print 'epsilon: ', epsilon
-    print 'replication: ', replication
-    print '--------------------'
+def plot(x, y, epsilon):
+    fig = plt.figure(0)
+    plt.errorbar(x, y, yerr=epsilon)
+    plt.show()
 
-    with open('analysis_{}'.format(interarrival_time_lambda), 'w') as analysis_file:
-        analysis_file.write(str(Yi_average)+'\n')
-        analysis_file.write(str(Yi_variance)+'\n')
-        analysis_file.write(str(epsilon)+'\n')
-        analysis_file.write(str(replication)+'\n')
+def main():
+    x = []
+    y = []
+    epsilon = []
+    for i in range(1, 10):
+        l = 1.0 / i 
+        result = ci_with_precision(l = l)
+        x.append((10-i)/10)
+        y.append(result[0])
+        epsilon.append(result[1])
+
+    plot(x, y, epsilon)
+
+    
 
 if __name__ == "__main__":
-
-    compute_ci('5')
-    #for i in range(3, 8):
-    #    compute_ci(str(i))
+    main()

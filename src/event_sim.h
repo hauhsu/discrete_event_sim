@@ -3,18 +3,21 @@
 #include <functional>
 #include <iostream>
 
+using Time = double;
+
+
 class Event
 {
 public:
-  Event (unsigned t): m_occure_time(t){
+  Event (Time t): m_occure_time(t){
   }
   virtual ~Event (){}
 
   virtual void process() = 0;
-  unsigned occuure_time() const {return m_occure_time;}
+  Time occuure_time() const {return m_occure_time;}
 
 private:
-  unsigned m_occure_time;
+  Time m_occure_time;
 
 };
 extern 
@@ -23,7 +26,7 @@ std::function<bool (const Event*, const Event*)> compare;
 class Simulator
 {
 public:
-  Simulator (unsigned sim_time): 
+  Simulator (Time sim_time): 
     m_time(0), 
     m_max_sim_time(sim_time),
     m_event_queue(compare)
@@ -45,13 +48,13 @@ public:
     std::cout << " --- " << m_time << " --- \n";
   }
 
-  unsigned current_time() {
+  Time current_time() {
     return m_time;
   }
 
 private:
-  unsigned m_time;
-  unsigned m_max_sim_time;
+  Time m_time;
+  Time m_max_sim_time;
   
   std::priority_queue
     <Event*, 

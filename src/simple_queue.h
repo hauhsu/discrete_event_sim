@@ -8,7 +8,8 @@
 #include "rand.h"
 #include "event_sim.h"
 
-extern unsigned inter_arrival_time_lambda;
+
+extern double inter_arrival_time_lambda;
 class Person
 {
   public:
@@ -24,42 +25,42 @@ class Person
       return m_id;
     }
 
-    void set_serve_time(unsigned t) {
+    void set_serve_time(Time t) {
       m_serve_time = t;
     }
 
-    unsigned get_serve_time() const {
+    double get_serve_time() const {
       return m_serve_time;
     }
 
-    void set_arrival_time(unsigned time) {
+    void set_arrival_time(Time time) {
       m_arrival_time = time;
     }
 
-    void set_leave_time(unsigned time) {
+    void set_leave_time(Time time) {
       m_leave_time= time;
     }
 
-    unsigned get_arrival_time() const {
+    Time get_arrival_time() const {
       return m_arrival_time;
     }
 
-    unsigned get_leave_time() const {
+    Time get_leave_time() const {
       return m_leave_time;
     }
 
-    unsigned get_system_time() const {
+    Time get_system_time() const {
       return m_leave_time - m_arrival_time;
     }
 
   private:
     unsigned m_id;
-    unsigned m_serve_time;
+    Time m_serve_time;
     static unsigned m_cnt;
 
     //duration in the system (waiting time + service time)
-    unsigned m_arrival_time;
-    unsigned m_leave_time;
+    Time m_arrival_time;
+    Time m_leave_time;
     
 };
 
@@ -68,10 +69,10 @@ class Person
 class SimpleQueueSim: public Simulator
 {
 public:
-  SimpleQueueSim (unsigned sim_time = 1000000, int queue_depth=20): 
+  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=30): 
     Simulator(sim_time),
     m_queue_depth(queue_depth){
-    gen_arrival_event(5);
+    gen_arrival_event(1);
 
     person_sys_time.open("person_sys_time.txt");
   }
@@ -101,7 +102,7 @@ public:
 
   void gen_arrival_event(const int num_event);
 
-  void add_serve_time(unsigned t) {m_total_service_time += t;}
+  void add_serve_time(Time t) {m_total_service_time += t;}
 
 
   bool queue_empty() {
@@ -118,13 +119,13 @@ public:
   class ArriveEvent: public Event
   {
     public:
-      ArriveEvent (unsigned t, SimpleQueueSim &s): 
+      ArriveEvent (Time t, SimpleQueueSim &s): 
         Event(t), m_parent_sim(s){ std::cout << "Next person will arrive at: " << t << std::endl;}
 
       void process() override {
         Person p;
         p.set_arrival_time( m_parent_sim.current_time() );
-        p.set_serve_time( m_parent_sim.m_rand_arrival_time.rand_exp_distribuiton(2)*100 );
+        p.set_serve_time( m_parent_sim.m_rand_arrival_time.rand_exp_distribuiton(1.0) );
         if (m_parent_sim.queue_empty()) {
           m_parent_sim.m_waiting_queue.push(p);
           m_parent_sim.serve(p);
@@ -138,6 +139,8 @@ public:
         else {
           m_parent_sim.put_in_queue(p);
         }
+        m_parent_sim.gen_arrival_event(1);
+        
 
       }
     private:
@@ -147,7 +150,7 @@ public:
   class LeaveEvent: public Event
   {
     public:
-      LeaveEvent(unsigned t, SimpleQueueSim &s): 
+      LeaveEvent(Time t, SimpleQueueSim &s): 
         Event(t), m_parent_sim(s){
           std::cout << "Service time is " << t << std::endl; 
         }
@@ -162,7 +165,6 @@ public:
           m_parent_sim.serve(m_parent_sim.m_waiting_queue.front());
         }
 
-        m_parent_sim.gen_arrival_event(1);
 
         m_parent_sim.person_sys_time << p.get_system_time() << std::endl;
         m_parent_sim.m_num_simulated_person++;
@@ -175,7 +177,7 @@ private:
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
   RandGen m_rand_arrival_time;
-  unsigned m_total_service_time;
+  Time m_total_service_time;
   unsigned m_max_people;
   unsigned m_num_simulated_person;
 
