@@ -4,6 +4,7 @@
 #include <cmath>
 #include <fstream>
 #include <iostream>
+#include <cassert>
 
 #include "rand.h"
 #include "event_sim.h"
@@ -69,7 +70,7 @@ class Person
 class SimpleQueueSim: public Simulator
 {
 public:
-  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=30): 
+  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=60): 
     Simulator(sim_time),
     m_queue_depth(queue_depth){
     gen_arrival_event(1);
@@ -125,7 +126,7 @@ public:
       void process() override {
         Person p;
         p.set_arrival_time( m_parent_sim.current_time() );
-        p.set_serve_time( m_parent_sim.m_rand_arrival_time.rand_exp_distribuiton(1.0) );
+        p.set_serve_time( m_parent_sim.m_rand_arrival_time.rand_exp_distribuiton(1.0/100) );
         if (m_parent_sim.queue_empty()) {
           m_parent_sim.m_waiting_queue.push(p);
           m_parent_sim.serve(p);
@@ -134,6 +135,7 @@ public:
         else if (m_parent_sim.queue_full()) {
           m_parent_sim.print_time();
           std::cout << "Queue is full!!!\n";
+          assert(0);
         }
 
         else {
