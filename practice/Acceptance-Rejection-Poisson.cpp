@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 
-#include "PRNG.h"
+#include "../src/rand.h"
 
 
 int main(int argc, char *argv[])
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
   const auto NUM_TEST = 1000;
   const auto alpha = 3.0;
 
-  RandNumGen::RandGen rand_gen(1);
+  RandGen rand_gen(1);
   std::vector<int> statistic(NUM_TEST, 0);
 
   rand_gen.rand(); 

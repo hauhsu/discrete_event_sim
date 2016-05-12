@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def main():
     max_sim_people = 1000
-    replication = 10
+    replication = 30
     data = []
     for i in range(replication):
         run_mm1(str(max_sim_people))
@@ -15,20 +15,20 @@ def main():
     H = []
     LCU = []
     UCU = []
-    for i in range(max_sim_people):
-        avg_data.append( mean([data[j][i] for j in range(replication)]) )
-        H.append( confidence_interval_half_width([data[j][i]\
+    for p in range(max_sim_people):
+        avg_data.append( mean([data[rep][p] for rep in range(replication)]) )
+        H.append( confidence_interval_half_width([data[j][p]\
             for j in range(replication)]))
-        UCU.append(avg_data[i]+H[i])
-        LCU.append(avg_data[i]-H[i])
+        UCU.append(avg_data[p]+H[p])
+        LCU.append(avg_data[p]-H[p])
         
 
 
     fig = plt.figure(0)
     x = [i for i in range(max_sim_people)]
     plt.errorbar(x, avg_data)
-    plt.errorbar(x, UCU)
-    plt.errorbar(x, LCU)
+    #plt.errorbar(x, UCU)
+    #plt.errorbar(x, LCU)
     plt.show()
     
 

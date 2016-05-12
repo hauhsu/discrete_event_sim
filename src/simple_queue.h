@@ -72,9 +72,9 @@ class SimpleQueueSim: public Simulator
 public:
   SimpleQueueSim (Time sim_time = 1000000, int queue_depth=60): 
     Simulator(sim_time),
-    m_queue_depth(queue_depth){
+    m_queue_depth(queue_depth)
+  {
     gen_arrival_event(1);
-
     person_sys_time.open("person_sys_time.txt");
   }
 
@@ -89,11 +89,13 @@ public:
   }
 
   void set_seed(unsigned seed) {
-    m_rand_arrival_time.seed(seed);
+    m_rand_stream.instance().set_seed(seed);
+    m_rand_arrival_time = m_rand_stream.get_rand_gen();
+    m_rand_service_time = m_rand_stream.get_rand_gen();
   }
 
   unsigned get_seed() {
-    return m_rand_arrival_time.get_seed();
+    return m_rand_stream.instance().get_seed();
   }
 
   virtual bool terminat() {
@@ -121,12 +123,16 @@ public:
   {
     public:
       ArriveEvent (Time t, SimpleQueueSim &s): 
-        Event(t), m_parent_sim(s){ std::cout << "Next person will arrive at: " << t << std::endl;}
+        Event(t), 
+        m_parent_sim(s) 
+      { 
+        std::cout << "Next person will arrive at: " << t << std::endl;
+      }
 
       void process() override {
         Person p;
         p.set_arrival_time( m_parent_sim.current_time() );
-        p.set_serve_time( m_parent_sim.m_rand_arrival_time.rand_exp_distribuiton(1.0/100) );
+        p.set_serve_time( m_parent_sim.m_rand_service_time.rand_exp_distribuiton(1.0/10) );
         if (m_parent_sim.queue_empty()) {
           m_parent_sim.m_waiting_queue.push(p);
           m_parent_sim.serve(p);
@@ -154,7 +160,7 @@ public:
     public:
       LeaveEvent(Time t, SimpleQueueSim &s): 
         Event(t), m_parent_sim(s){
-          std::cout << "Service time is " << t << std::endl; 
+          std::cout << "Service time is " << t-m_parent_sim.current_time() << std::endl; 
         }
 
       void process() override {
@@ -178,7 +184,9 @@ public:
 private:
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
+  RandStream m_rand_stream;
   RandGen m_rand_arrival_time;
+  RandGen m_rand_service_time;
   Time m_total_service_time;
   unsigned m_max_people;
   unsigned m_num_simulated_person;

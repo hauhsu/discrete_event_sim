@@ -3,19 +3,19 @@ from subprocess import call
 from statistics import mean, stdev, variance
 import matplotlib.pyplot as plt
 
-interarrival_time_lambda = 1.0/99
-def run_mm1(sim_people='30'):
-    global interarrival_time_lambda
+interarrival_mean = 12
+def run_mm1(sim_people='10'):
+    global interarrival_mean
     try:
         seed_file = open('next_seed.txt')
         seed = seed_file.readline()
 
     except FileNotFoundError:
-        seed = '1'
+        seed = '100'
 
 
     devnull = open('/dev/null', 'w')
-    call(['./a.out', sim_people, seed, str(interarrival_time_lambda)],
+    call(['./a.out', sim_people, seed, str(interarrival_mean)],
         stdout=devnull)
 
 
@@ -35,10 +35,10 @@ def confidence_interval_half_width(data, confidence=0.95):
     return t.interval(confidence, n-1)[1] * (standard_deviation / n**0.5)
 
 
-def ci_with_precision(l=0.2, confidence=0.95, precision=0.9):
-    global interarrival_time_lambda
-    interarrival_time_lambda = l
-    run_mm1('300')
+def ci_with_precision(l=12, confidence=0.95, precision=0.9):
+    global interarrival_mean
+    interarrival_mean = l
+    run_mm1('30')
     data = get_sim_result()
 
     Yi_average = mean(data)
@@ -84,10 +84,9 @@ def main():
     x = []
     y = []
     epsilon = []
-    for i in [1, 2, 3, 4, 5]:
-        l = 1.0 / i 
-        result = ci_with_precision(l = l)
-        x.append((10-i)/10)
+    for i in range(100, 10, -1):
+        result = ci_with_precision(l = i)
+        x.append(10/i)
         y.append(result[0])
         epsilon.append(result[1])
 

@@ -45,7 +45,8 @@ public:
     m_event_queue.push(new_event);  
   }
   void print_time() {
-    std::cout << " --- " << m_time << " --- \n";
+    std::cout << "\n"
+              << "--- @" << m_time << " --- \n";
   }
 
   Time current_time() {
