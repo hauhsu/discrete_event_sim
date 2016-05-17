@@ -1,5 +1,7 @@
 #include "event_sim.h"
 
+std::string Simulator::save_file_name("save.txt");
+
 std::function<bool (const Event*, const Event*)>
 compare =  [] (const Event* a, const Event* b) { 
   return a->occuure_time() > b->occuure_time();

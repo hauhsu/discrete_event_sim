@@ -14,13 +14,19 @@ extern double inter_arrival_time_lambda;
 class Person
 {
   public:
-    Person(): m_id(m_cnt){m_cnt ++;}
+    Person(): 
+      m_id(m_cnt),
+      m_serve_time(0),
+      m_arrival_time(0),
+      m_leave_time(0)
+    {m_cnt ++;}
+    
     Person(const Person &p): 
       m_id( p.id() ), 
       m_serve_time( p.get_serve_time() ),
       m_arrival_time( p.get_arrival_time() ),
       m_leave_time( p.get_leave_time() )
-      {}
+    {}
 
     unsigned id() const {
       return m_id;
@@ -54,6 +60,16 @@ class Person
       return m_leave_time - m_arrival_time;
     }
 
+    std::string get_save_str() const {
+      std::ostringstream oss;
+      oss << m_id << " " << m_serve_time << " " 
+          << m_arrival_time << " " << m_leave_time << "\n";
+      return oss.str();
+    }
+
+    static unsigned get_m_cnt() {return m_cnt;}
+    void set_m_cnt(unsigned cnt) {m_cnt = cnt;}
+
   private:
     unsigned m_id;
     Time m_serve_time;
@@ -70,7 +86,7 @@ class Person
 class SimpleQueueSim: public Simulator
 {
 public:
-  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=60): 
+  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=1000): 
     Simulator(sim_time),
     m_queue_depth(queue_depth)
   {
@@ -122,7 +138,7 @@ public:
   {
     public:
       ArriveEvent (Time t, SimpleQueueSim &s): 
-        Event(t), 
+        Event(t, "ArrivalEvent"), 
         m_parent_sim(s) 
       { 
         std::cout << "Next person will arrive at: " << t << std::endl;
@@ -158,7 +174,7 @@ public:
   {
     public:
       LeaveEvent(Time t, SimpleQueueSim &s): 
-        Event(t), m_parent_sim(s){
+        Event(t, "LeaveEvent"), m_parent_sim(s){
           std::cout << "Service time is " << t-m_parent_sim.current_time() << std::endl; 
         }
 
@@ -180,10 +196,29 @@ public:
       SimpleQueueSim& m_parent_sim;
   };
 
+  virtual void save_simulation() {
+    Simulator::save_simulation();
+    std::ofstream save(Simulator::save_file_name, std::ios_base::app);
+    save << m_rand_service_time.get_seed() << " " 
+         << m_rand_arrival_time.get_seed() << "\n";
+
+    save << m_total_service_time << " " <<
+            m_max_people << " " << 
+            m_num_simulated_person << " ";
+    //People waiting in queue
+    save << m_queue_depth << std::endl;
+    save << Person::get_m_cnt() << std::endl;
+    for (int i = 0; i < m_waiting_queue.size(); ++i) {
+      auto p = m_waiting_queue.front();
+      m_waiting_queue.pop();
+      m_waiting_queue.push(p);
+      save << p.get_save_str();
+    }
+  }
+
 private:
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
-  RandStream m_rand_stream;
   RandGen m_rand_arrival_time;
   RandGen m_rand_service_time;
   Time m_total_service_time;
@@ -191,6 +226,4 @@ private:
   unsigned m_num_simulated_person;
 
   std::ofstream person_sys_time;
-
-
 };

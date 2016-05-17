@@ -24,6 +24,7 @@ int main(int argc, char *argv[])
   sqs.set_max_people(max_people);
   sqs.set_seed(seed);
   sqs.run();
+  sqs.save_simulation();
   std::ofstream seed_file("next_seed.txt");
   seed_file<< sqs.get_seed() << std::endl;
   return 0;
