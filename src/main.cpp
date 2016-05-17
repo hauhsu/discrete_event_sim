@@ -3,9 +3,9 @@
 
 int main(int argc, char *argv[])
 {
-  auto max_people = 10;
+  auto max_people = 5;
   unsigned seed = 10;
-  auto interarrival_time_mean = 1.0;
+  auto interarrival_time_mean = 11.0;
 
   if (argc == 4) {
     max_people = std::stoi(argv[1]);

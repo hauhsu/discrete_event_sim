@@ -89,13 +89,12 @@ public:
   }
 
   void set_seed(unsigned seed) {
-    m_rand_stream.instance().set_seed(seed);
-    m_rand_arrival_time = m_rand_stream.get_rand_gen();
-    m_rand_service_time = m_rand_stream.get_rand_gen();
+    m_rand_arrival_time.seed(seed);
+    m_rand_service_time.seed(seed+10000);
   }
 
   unsigned get_seed() {
-    return m_rand_stream.instance().get_seed();
+    return m_rand_arrival_time.get_seed();
   }
 
   virtual bool terminat() {

@@ -3,7 +3,7 @@ from subprocess import call
 from statistics import mean, stdev, variance
 import matplotlib.pyplot as plt
 
-interarrival_mean = 12
+interarrival_mean = 15
 def run_mm1(sim_people='10'):
     global interarrival_mean
     try:
@@ -11,6 +11,7 @@ def run_mm1(sim_people='10'):
         seed = seed_file.readline()
 
     except FileNotFoundError:
+        print("No seed file, using 100")
         seed = '100'
 
 

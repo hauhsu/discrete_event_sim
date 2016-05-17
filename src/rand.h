@@ -47,16 +47,18 @@ class RandStream
     RandStream(int seed = 1, int interval = 1000000):
       m_next_init_seed(seed), m_interval(interval){}
 
+    static RandStream* s_instance;
+
     void set_seed_interval(int interval) {
-        m_interval = interval;
+        instance()->m_interval = interval;
     }
 
     void set_seed(unsigned seed) {
-      m_next_init_seed = seed;
+      instance()->m_next_init_seed = seed;
     }
 
     unsigned get_seed() {
-      return m_next_init_seed;
+      return instance()->m_next_init_seed;
     }
 
     RandGen get_rand_gen() {
@@ -65,9 +67,13 @@ class RandStream
       return r;
     }
 
-    static RandStream& instance() {
-      static RandStream s_instance;
-        return s_instance;
+    static RandStream* instance() {
+      /*
+      if (not s_instance) 
+        s_instance = new RandStream;
+
+      return s_instance;
+      */
     }
 
   private:
@@ -89,6 +95,8 @@ class RandStream
     int m_interval;
 
 };
+
+
 
 
 

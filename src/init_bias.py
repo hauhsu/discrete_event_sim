@@ -11,6 +11,7 @@ def main():
         run_mm1(str(max_sim_people))
         data.append(get_sim_result())
 
+
     avg_data = []
     H = []
     LCU = []
