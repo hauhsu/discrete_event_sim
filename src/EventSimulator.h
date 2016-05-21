@@ -9,16 +9,16 @@
 extern 
 std::function<bool (const Event*, const Event*)> compare;
 
-class Simulator
+class EventSimulator
 {
 public:
-  Simulator (Time max_sim_time): 
+  EventSimulator (Time max_sim_time): 
     m_time(0), 
     m_max_sim_time(max_sim_time),
     m_event_queue(compare)
   {}
 
-  virtual ~Simulator ();
+  virtual ~EventSimulator ();
 
   void run();
 

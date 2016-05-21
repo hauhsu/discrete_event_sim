@@ -1,24 +1,17 @@
-#include "event_sim.h"
+#include "EventSimulator.h"
 
 
-std::string Simulator::save_file_name("save.txt");
+std::string EventSimulator::save_file_name("save.txt");
 
-Simulator::~Simulator() {
+EventSimulator::~EventSimulator() {
   while (m_event_queue.size() != 0) {
     delete m_event_queue.top(); 
     m_event_queue.pop();
   }
 }
 
-/*
- * Event comparator (for sorting)
- */
-std::function<bool (const Event*, const Event*)>
-compare =  [] (const Event* a, const Event* b) { 
-  return a->occuure_time() > b->occuure_time();
-};
 
-void Simulator::run () {
+void EventSimulator::run () {
   while (!terminat()) {
     Event * next_event = m_event_queue.top ();
     m_event_queue.pop ();
@@ -29,7 +22,7 @@ void Simulator::run () {
 }
 
 
-void Simulator::save_simulation() {
+void EventSimulator::save_simulation() {
   std::ofstream save("save.txt");
   save << m_time << std::endl;
   save << m_max_sim_time << std::endl;
@@ -53,4 +46,6 @@ void Simulator::save_simulation() {
 }
 
 
+void EventSimulator::load_simulation() {
 
+}

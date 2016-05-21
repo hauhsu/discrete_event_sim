@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "rand.h"
-#include "event_sim.h"
+#include "EventSimulator.h"
 
 
 extern double inter_arrival_time_lambda;
@@ -83,11 +83,11 @@ class Person
 
 
 
-class SimpleQueueSim: public Simulator
+class SimpleQueueSim: public EventSimulator
 {
 public:
   SimpleQueueSim (Time sim_time = 1000000, int queue_depth=1000): 
-    Simulator(sim_time),
+    EventSimulator(sim_time),
     m_queue_depth(queue_depth)
   {
     gen_arrival_event(1);
@@ -114,7 +114,7 @@ public:
   }
 
   virtual bool terminat() {
-    return Simulator::terminat() or  m_num_simulated_person >= m_max_people;
+    return EventSimulator::terminat() or  m_num_simulated_person >= m_max_people;
   }
 
 
@@ -197,8 +197,8 @@ public:
   };
 
   virtual void save_simulation() {
-    Simulator::save_simulation();
-    std::ofstream save(Simulator::save_file_name, std::ios_base::app);
+    EventSimulator::save_simulation();
+    std::ofstream save(EventSimulator::save_file_name, std::ios_base::app);
     save << m_rand_service_time.get_seed() << " " 
          << m_rand_arrival_time.get_seed() << "\n";
 
