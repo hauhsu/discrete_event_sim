@@ -1,5 +1,8 @@
 #include "event_sim.h"
 
+
+std::string Simulator::save_file_name("save.txt");
+
 Simulator::~Simulator() {
   while (m_event_queue.size() != 0) {
     delete m_event_queue.top(); 
@@ -7,8 +10,9 @@ Simulator::~Simulator() {
   }
 }
 
-std::string Simulator::save_file_name("save.txt");
-
+/*
+ * Event comparator (for sorting)
+ */
 std::function<bool (const Event*, const Event*)>
 compare =  [] (const Event* a, const Event* b) { 
   return a->occuure_time() > b->occuure_time();

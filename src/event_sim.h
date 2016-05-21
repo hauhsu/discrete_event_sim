@@ -4,32 +4,8 @@
 #include <functional>
 #include <iostream>
 #include <fstream>
+#include "EventBase.h"
 
-using Time = double;
-
-
-class Event
-{
-public:
-  Event (Time t, std::string type): 
-    m_occure_time(t),
-    m_type(type)
-  {}
-  virtual ~Event (){}
-
-  virtual void process() = 0;
-  std::string get_save_str() const {
-    std::ostringstream ss;
-    ss << m_type << " " << m_occure_time << "\n";
-    return ss.str();
-  }
-  Time occuure_time() const {return m_occure_time;}
-  std::string type() const {return m_type;}
-
-private:
-  Time m_occure_time;
-  std::string m_type;
-};
 extern 
 std::function<bool (const Event*, const Event*)> compare;
 
@@ -54,20 +30,23 @@ public:
     m_event_queue.push(new_event);  
   }
 
+  Time current_time() {
+    return m_time;
+  }
+
   void print_time() {
     std::cout << "\n"
               << "--- @" << m_time << " --- \n";
   }
 
-  Time current_time() {
-    return m_time;
-  }
 
-
-  virtual void save_simulation();
-  void load_simulation();
-
+  /*
+   * Save/load simulation
+   */
   static std::string save_file_name;
+  virtual void save_simulation();
+  virtual void load_simulation();
+
 private:
   Time m_time;
   Time m_max_sim_time;
