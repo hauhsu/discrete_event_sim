@@ -1,26 +1,29 @@
 #ifndef RAND_H_H8TP0KED
 #define RAND_H_H8TP0KED
 
-
-
 #include <iostream>
 #include <vector>
 #include <cmath>
 
 
-extern const int __a;
-extern const int __m;
-
-unsigned __get_next_seed(unsigned seed);
 
 class RandGen
 {
   public:
-    RandGen(int seed=1): m_seed(seed){}
+    RandGen(int seed=1):
+      m_seed(seed),
+      __a(16807),
+      __m(2147483647)
+    {}
+
+
+    RandGen& operator=(RandGen other) {
+      m_seed = other.get_seed();
+      return *this;
+    }
      
     double rand(){ 
       m_seed = __get_next_seed(m_seed);
-
       return static_cast<double>(m_seed)  / __m;
     }
 
@@ -36,66 +39,33 @@ class RandGen
     unsigned get_seed() {
       return m_seed;
     }
-       
-  private:
-    unsigned int m_seed;
-};
 
-class RandStream
-{
-  public:
-    RandStream(int seed = 1, int interval = 1000000):
-      m_next_init_seed(seed), m_interval(interval){}
+    /*
+     * Generate a rand stream base on 
+     * current seed of the RandGen
+     */
+    RandGen rand_stream() {
+      RandGen r(m_seed);
+      auto interval = 1000000;
 
-    static RandStream* s_instance;
-
-    void set_seed_interval(int interval) {
-        instance()->m_interval = interval;
-    }
-
-    void set_seed(unsigned seed) {
-      instance()->m_next_init_seed = seed;
-    }
-
-    unsigned get_seed() {
-      return instance()->m_next_init_seed;
-    }
-
-    RandGen get_rand_gen() {
-      auto r = RandGen(m_next_init_seed); 
-      get_next_seed();
+      for (int i = 0; i < interval; ++i) {
+        r.seed(__get_next_seed(r.get_seed()));
+      }
       return r;
     }
 
-    static RandStream* instance() {
-      /*
-      if (not s_instance) 
-        s_instance = new RandStream;
-
-      return s_instance;
-      */
-    }
-
+       
   private:
-    unsigned get_next_seed() {
-        for (int i = 0; i < m_interval; ++i) {
-          m_next_init_seed = __get_next_seed(m_next_init_seed);
-        }
-        return m_next_init_seed;
+    unsigned int m_seed;
+
+    const int __a;
+    const int __m;
+
+    unsigned __get_next_seed(unsigned seed)
+    {
+      return  (__a * seed) % __m;
     }
-
-
-
-    //Disable copy methods
-    RandStream(RandStream &s) = delete;
-    void operator = (RandStream const&) = delete;
-
-  private: 
-    unsigned m_next_init_seed;
-    int m_interval;
-
 };
-
 
 
 
