@@ -105,7 +105,7 @@ public:
   }
 
   void set_seed(unsigned seed) {
-    m_rand_arrival_time.seed(seed);
+    m_rand_arrival_time.set_seed(seed);
     m_rand_service_time = m_rand_arrival_time.rand_stream();
   }
 
@@ -147,7 +147,7 @@ public:
       void process() override {
         Person p;
         p.set_arrival_time( m_parent_sim.current_time() );
-        p.set_serve_time( m_parent_sim.m_rand_service_time.rand_exp_distribuiton(1.0/10) );
+        p.set_serve_time( m_parent_sim.m_rand_service_time.rand_exp(1.0/10) );
         if (m_parent_sim.queue_empty()) {
           m_parent_sim.m_waiting_queue.push(p);
           m_parent_sim.serve(p);
@@ -219,8 +219,8 @@ public:
 private:
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
-  RandGen m_rand_arrival_time;
-  RandGen m_rand_service_time;
+  Rand m_rand_arrival_time;
+  Rand m_rand_service_time;
   Time m_total_service_time;
   unsigned m_max_people;
   unsigned m_num_simulated_person;

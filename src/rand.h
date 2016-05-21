@@ -7,32 +7,22 @@
 
 
 
-class RandGen
+class Rand
 {
   public:
-    RandGen(int seed=1):
-      m_seed(seed),
-      __a(16807),
-      __m(2147483647)
-    {}
+    Rand(int seed=1):
+      m_seed(seed) {}
 
-
-    RandGen& operator=(RandGen other) {
+    Rand& operator=(Rand other) {
       m_seed = other.get_seed();
       return *this;
     }
      
-    double rand(){ 
-      m_seed = __get_next_seed(m_seed);
-      return static_cast<double>(m_seed)  / __m;
-    }
+    double rand();
 
-    double rand_exp_distribuiton(const double lambda) {
-      double r = rand();
-      return  (-1.0/lambda) * log(1 - r);
-    }
+    double rand_exp(const double lambda);
 
-    void seed(int s) {
+    void set_seed(int s) {
       m_seed = s; 
     }
 
@@ -42,28 +32,19 @@ class RandGen
 
     /*
      * Generate a rand stream base on 
-     * current seed of the RandGen
+     * current seed of the 'this' Rand
      */
-    RandGen rand_stream() {
-      RandGen r(m_seed);
-      auto interval = 1000000;
-
-      for (int i = 0; i < interval; ++i) {
-        r.seed(__get_next_seed(r.get_seed()));
-      }
-      return r;
-    }
+    Rand rand_stream();
 
        
   private:
     unsigned int m_seed;
 
-    const int __a;
-    const int __m;
+    static const unsigned __a;
+    static const unsigned __m;
 
-    unsigned __get_next_seed(unsigned seed)
-    {
-      return  (__a * seed) % __m;
+    unsigned gen_next_seed() {
+      return  (__a * m_seed) % __m;
     }
 };
 
