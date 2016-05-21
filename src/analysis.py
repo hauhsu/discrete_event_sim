@@ -3,7 +3,7 @@ from subprocess import call
 from statistics import mean, stdev, variance
 import matplotlib.pyplot as plt
 
-interarrival_mean = 15
+interarrival_mean = 11
 def run_mm1(sim_people='10'):
     global interarrival_mean
     try:

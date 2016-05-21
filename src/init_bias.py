@@ -4,7 +4,7 @@ from analysis import *
 import matplotlib.pyplot as plt
 
 def main():
-    max_sim_people = 1000
+    max_sim_people = 5000
     replication = 30
     data = []
     for i in range(replication):

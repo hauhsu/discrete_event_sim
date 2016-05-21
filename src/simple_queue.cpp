@@ -8,11 +8,15 @@ double inter_arrival_time_lambda;
 //
 // SimpleQueueSim definitions
 //
-void SimpleQueueSim::gen_arrival_event(const int num_event)
-{
-  for (int i = 0; i < num_event; ++i) {
-    double arrival_time = m_rand_arrival_time.rand_exp(inter_arrival_time_lambda) + current_time();
+void SimpleQueueSim::gen_arrival_event() {
+    auto interarrival_time = m_rand_arrival_time.rand_exp(inter_arrival_time_lambda);
+    auto arrival_time = interarrival_time + current_time();
     add_event(new ArriveEvent(arrival_time, *this)); 
+}
+
+void SimpleQueueSim::gen_arrival_events(const int num_event) {
+  for (int i = 0; i < num_event; ++i) {
+    gen_arrival_event();
   }
 }
 

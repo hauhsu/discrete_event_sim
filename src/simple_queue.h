@@ -9,8 +9,6 @@
 #include "rand.h"
 #include "EventSimulator.h"
 
-
-extern double inter_arrival_time_lambda;
 class Person
 {
   public:
@@ -32,7 +30,7 @@ class Person
       return m_id;
     }
 
-    void set_serve_time(Time t) {
+    void set_serve_time(const Time t) {
       m_serve_time = t;
     }
 
@@ -40,16 +38,16 @@ class Person
       return m_serve_time;
     }
 
-    void set_arrival_time(Time time) {
+    void set_arrival_time(const Time time) {
       m_arrival_time = time;
-    }
-
-    void set_leave_time(Time time) {
-      m_leave_time= time;
     }
 
     Time get_arrival_time() const {
       return m_arrival_time;
+    }
+
+    void set_leave_time(const Time time) {
+      m_leave_time= time;
     }
 
     Time get_leave_time() const {
@@ -81,16 +79,14 @@ class Person
     
 };
 
-
-
 class SimpleQueueSim: public EventSimulator
 {
-public:
-  SimpleQueueSim (Time sim_time = 1000000, int queue_depth=1000): 
-    EventSimulator(sim_time),
-    m_queue_depth(queue_depth)
+  public:
+    SimpleQueueSim (Time max_sim_time = 1000000, int queue_depth=1000): 
+      EventSimulator(max_sim_time),
+      m_queue_depth(queue_depth)
   {
-    gen_arrival_event(1);
+    gen_arrival_event();
     person_sys_time.open("person_sys_time.txt");
   }
 
@@ -118,7 +114,8 @@ public:
   }
 
 
-  void gen_arrival_event(const int num_event);
+  void gen_arrival_event();
+  void gen_arrival_events(const int num_events);
 
   void add_serve_time(Time t) {m_total_service_time += t;}
 
@@ -134,67 +131,7 @@ public:
 
   void put_in_queue(Person p);
   
-  class ArriveEvent: public Event
-  {
-    public:
-      ArriveEvent (Time t, SimpleQueueSim &s): 
-        Event(t, "ArrivalEvent"), 
-        m_parent_sim(s) 
-      { 
-        std::cout << "Next person will arrive at: " << t << std::endl;
-      }
 
-      void process() override {
-        Person p;
-        p.set_arrival_time( m_parent_sim.current_time() );
-        p.set_serve_time( m_parent_sim.m_rand_service_time.rand_exp(1.0/10) );
-        if (m_parent_sim.queue_empty()) {
-          m_parent_sim.m_waiting_queue.push(p);
-          m_parent_sim.serve(p);
-        }
-
-        else if (m_parent_sim.queue_full()) {
-          m_parent_sim.print_time();
-          std::cout << "Queue is full!!!\n";
-          assert(0);
-        }
-
-        else {
-          m_parent_sim.put_in_queue(p);
-        }
-        m_parent_sim.gen_arrival_event(1);
-        
-
-      }
-    private:
-      SimpleQueueSim& m_parent_sim;
-  };
-
-  class LeaveEvent: public Event
-  {
-    public:
-      LeaveEvent(Time t, SimpleQueueSim &s): 
-        Event(t, "LeaveEvent"), m_parent_sim(s){
-          std::cout << "Service time is " << t-m_parent_sim.current_time() << std::endl; 
-        }
-
-      void process() override {
-        Person p = m_parent_sim.m_waiting_queue.front();
-        p.set_leave_time( m_parent_sim.current_time() );
-        m_parent_sim.m_waiting_queue.pop();
-        m_parent_sim.print_time();
-        std::cout << "Person " << p.id() << " is leaving." << std::endl; 
-        if (!m_parent_sim.m_waiting_queue.empty()) {
-          m_parent_sim.serve(m_parent_sim.m_waiting_queue.front());
-        }
-
-
-        m_parent_sim.person_sys_time << p.get_system_time() << std::endl;
-        m_parent_sim.m_num_simulated_person++;
-      }
-    private:
-      SimpleQueueSim& m_parent_sim;
-  };
 
   virtual void save_simulation() {
     EventSimulator::save_simulation();
@@ -217,6 +154,8 @@ public:
   }
 
 private:
+  class ArriveEvent;
+  class LeaveEvent;
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
   Rand m_rand_arrival_time;
@@ -227,3 +166,65 @@ private:
 
   std::ofstream person_sys_time;
 };
+extern double inter_arrival_time_lambda;
+
+
+class SimpleQueueSim::ArriveEvent: public Event
+{
+  public:
+    ArriveEvent (Time t, SimpleQueueSim &s): 
+      Event(t, "ArrivalEvent"), 
+      m_parent_sim(s) 
+  { 
+    std::cout << "Next person will arrive at: " << t << std::endl;
+  }
+
+    void process() override {
+      Person p;
+      p.set_arrival_time( m_parent_sim.current_time() );
+      p.set_serve_time( m_parent_sim.m_rand_service_time.rand_exp(1.0/10) );
+      if (m_parent_sim.queue_empty()) {
+        m_parent_sim.m_waiting_queue.push(p);
+        m_parent_sim.serve(p);
+      }
+
+      else if (m_parent_sim.queue_full()) {
+        m_parent_sim.print_time();
+        std::cout << "Queue is full!!!\n";
+        assert(0);
+      }
+
+      else {
+        m_parent_sim.put_in_queue(p);
+      }
+      m_parent_sim.gen_arrival_event();
+    }
+  private:
+    SimpleQueueSim& m_parent_sim;
+};
+
+class SimpleQueueSim::LeaveEvent: public Event
+{
+  public:
+    LeaveEvent(Time t, SimpleQueueSim &s): 
+      Event(t, "LeaveEvent"), m_parent_sim(s){
+        std::cout << "Service time is " << t-m_parent_sim.current_time() << std::endl; 
+      }
+
+    void process() override {
+      Person p = m_parent_sim.m_waiting_queue.front();
+      p.set_leave_time( m_parent_sim.current_time() );
+      m_parent_sim.m_waiting_queue.pop();
+      m_parent_sim.print_time();
+      std::cout << "Person " << p.id() << " is leaving." << std::endl; 
+      if (!m_parent_sim.m_waiting_queue.empty()) {
+        m_parent_sim.serve(m_parent_sim.m_waiting_queue.front());
+      }
+
+      m_parent_sim.person_sys_time << p.get_system_time() << std::endl;
+      m_parent_sim.m_num_simulated_person++;
+    }
+  private:
+    SimpleQueueSim& m_parent_sim;
+};
+
