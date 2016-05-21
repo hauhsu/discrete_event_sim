@@ -36,13 +36,13 @@ std::function<bool (const Event*, const Event*)> compare;
 class Simulator
 {
 public:
-  Simulator (Time sim_time): 
+  Simulator (Time max_sim_time): 
     m_time(0), 
-    m_max_sim_time(sim_time),
+    m_max_sim_time(max_sim_time),
     m_event_queue(compare)
   {}
 
-  virtual ~Simulator () {}
+  virtual ~Simulator ();
 
   void run();
 
@@ -51,9 +51,9 @@ public:
   }
 
   void add_event(Event *new_event) {
-
     m_event_queue.push(new_event);  
   }
+
   void print_time() {
     std::cout << "\n"
               << "--- @" << m_time << " --- \n";
@@ -64,32 +64,8 @@ public:
   }
 
 
-  virtual void save_simulation() {
-    std::ofstream save("save.txt");
-    save << m_time << std::endl;
-    save << m_max_sim_time << std::endl;
-    save << m_event_queue.size() << std::endl;
-
-    auto q_size = m_event_queue.size();
-    //pop events from priority queue and put into a vector
-    std::vector<Event*> tmp;
-    for (int i = 0;  i < q_size; i++) {
-      auto next_event = m_event_queue.top();
-      m_event_queue.pop();
-      tmp.push_back(next_event);
-      std::cout << next_event->get_save_str();
-    }
-    //save put event back from vector
-    for (auto &event : tmp) {
-      save << event->get_save_str();
-      m_event_queue.push(event);
-    }
-   
-  }
-
-  void load_simulation() {
-
-  }
+  virtual void save_simulation();
+  void load_simulation();
 
   static std::string save_file_name;
 private:
