@@ -61,6 +61,7 @@ void SimpleQueueSim::save_simulation() {
     p.save(emitter);
   }
   emitter << YAML::EndSeq;
+  emitter << YAML::EndMap;
   emitter << YAML::EndDoc;
 
   std::ofstream save(EventSimulator::save_file_name, std::ios_base::app);
