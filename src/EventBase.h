@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "yaml-cpp/yaml.h"
 
 #include "declare.h"
 
@@ -15,7 +16,7 @@ public:
 
   virtual void process() = 0;
 
-  std::string get_save_str() const;
+  void save(YAML::Emitter &emitter) const;
 
   Time occuure_time() const {return m_occure_time;}
   std::string type() const {return m_type;}

@@ -1,4 +1,6 @@
-#include "simple_queue.h"
+#include "SimpleQueue.h"
+
+#include "yaml-cpp/yaml.h"
 
 unsigned Person::m_cnt = 0;
 
@@ -36,3 +38,36 @@ void SimpleQueueSim::put_in_queue(Person p) {
 
 }
 
+void SimpleQueueSim::save_simulation() {
+
+  EventSimulator::save_simulation();
+  YAML::Emitter emitter;
+  emitter << YAML::BeginDoc;
+  emitter << YAML::BeginMap;
+  emitter << YAML::Key << "service time seed"      << YAML::Value << m_rand_service_time.get_seed();
+  emitter << YAML::Key << "interarrival time seed" << YAML::Value << m_rand_arrival_time.get_seed();
+  emitter << YAML::Key << "total service time"     << YAML::Value << m_total_service_time;
+  emitter << YAML::Key << "max simulaiton people"  << YAML::Value <<  m_max_people;
+  emitter << YAML::Key << "simulated people"       << YAML::Value << m_num_simulated_person;
+  //People waiting in queue
+  emitter << YAML::Key << "waiting queue depth"    << YAML::Value << m_queue_depth;
+  emitter << YAML::Key << "number of person instances" << YAML::Value << Person::get_m_cnt();
+  emitter << YAML::Key << "people waiting in queue"
+          << YAML::BeginSeq;
+  for (unsigned i = 0; i < m_waiting_queue.size(); ++i) {
+    auto p = m_waiting_queue.front();
+    m_waiting_queue.pop();
+    m_waiting_queue.push(p);
+    p.save(emitter);
+  }
+  emitter << YAML::EndSeq;
+  emitter << YAML::EndDoc;
+
+  std::ofstream save(EventSimulator::save_file_name, std::ios_base::app);
+  save << emitter.c_str();
+}
+
+
+void SimpleQueueSim::load_simulation() {
+
+}

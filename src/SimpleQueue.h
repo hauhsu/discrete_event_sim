@@ -6,6 +6,8 @@
 #include <iostream>
 #include <cassert>
 
+#include "yaml-cpp/yaml.h"
+
 #include "rand.h"
 #include "EventSimulator.h"
 
@@ -58,11 +60,13 @@ class Person
       return m_leave_time - m_arrival_time;
     }
 
-    std::string get_save_str() const {
-      std::ostringstream oss;
-      oss << m_id << " " << m_serve_time << " " 
-          << m_arrival_time << " " << m_leave_time << "\n";
-      return oss.str();
+    void save(YAML::Emitter& emitter) const {
+      emitter << YAML::BeginMap;
+      emitter << YAML::Key << "id" << YAML::Value << m_id;
+      emitter << YAML::Key << "service time" << YAML::Value << m_serve_time;
+      emitter << YAML::Key << "arrival time" << YAML::Value << m_arrival_time;
+      emitter << YAML::Key << "leave time"   << YAML::Value << m_leave_time;
+      emitter << YAML::EndMap;
     }
 
     static unsigned get_m_cnt() {return m_cnt;}
@@ -131,27 +135,8 @@ class SimpleQueueSim: public EventSimulator
 
   void put_in_queue(Person p);
   
-
-
-  virtual void save_simulation() {
-    EventSimulator::save_simulation();
-    std::ofstream save(EventSimulator::save_file_name, std::ios_base::app);
-    save << m_rand_service_time.get_seed() << " " 
-         << m_rand_arrival_time.get_seed() << "\n";
-
-    save << m_total_service_time << " " <<
-            m_max_people << " " << 
-            m_num_simulated_person << " ";
-    //People waiting in queue
-    save << m_queue_depth << std::endl;
-    save << Person::get_m_cnt() << std::endl;
-    for (int i = 0; i < m_waiting_queue.size(); ++i) {
-      auto p = m_waiting_queue.front();
-      m_waiting_queue.pop();
-      m_waiting_queue.push(p);
-      save << p.get_save_str();
-    }
-  }
+  virtual void save_simulation();
+  virtual void load_simulation();
 
 private:
   class ArriveEvent;
