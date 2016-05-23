@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
 
     //load simulation
     ("load", po::value<std::string>(), "load simulation from saved file")
+    ("add-sim-people", po::value<unsigned>(), "set additional people to simulate")
     ;
 
 
@@ -59,7 +60,7 @@ int main(int argc, char *argv[])
   unsigned service_time_rand_seed = 0;
   auto interarrival_time_mean = 11.0;
   unsigned waiting_queue_depth = 1000;
-  std::string load_file("");
+  std::string load_file("save.yaml");
 
   if (vm.count("help")) {
     std::cout << desc << std::endl;
@@ -74,6 +75,10 @@ int main(int argc, char *argv[])
     load_file = vm["load"].as<std::string>();
     sqs.load_simulation(load_file);
     std::cout << "Load simulation from file: " << load_file<< std::endl;
+
+    auto additional_people = vm["add-sim-people"].as<unsigned>();
+    std::cout << "Add simulation people: " << additional_people << std::endl;
+    sqs.increase_max_people(additional_people);
   }
 
   //New simulation

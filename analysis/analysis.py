@@ -3,30 +3,6 @@ from subprocess import call
 from statistics import mean, stdev, variance
 import matplotlib.pyplot as plt
 
-interarrival_mean = 11
-def run_mm1(sim_people='10'):
-    global interarrival_mean
-    try:
-        seed_file = open('next_seed.txt')
-        seed = seed_file.readline()
-
-    except FileNotFoundError:
-        print("No seed file, using 100")
-        seed = '100'
-
-
-    devnull = open('/dev/null', 'w')
-    call(['./a.out', sim_people, seed, str(interarrival_mean)],
-        stdout=devnull)
-
-
-def get_sim_result(bias=0):
-    yi = []
-    with open('person_sys_time.txt') as p_sys_time_file:
-        for line in p_sys_time_file:
-           yi.append(float(line)) 
-
-    return yi[bias:]
 
 def confidence_interval_half_width(data, confidence=0.95):
     n = len(data)

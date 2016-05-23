@@ -121,6 +121,10 @@ class SimpleQueueSim: public EventSimulator
     m_max_people = num;
   }
 
+  void increase_max_people(unsigned p) {
+    m_max_people += p;
+  }
+
   void set_seed(unsigned seed) {
     m_rand_arrival_time.set_seed(seed);
     m_rand_service_time = m_rand_arrival_time.rand_stream();
