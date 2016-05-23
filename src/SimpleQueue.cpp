@@ -5,13 +5,12 @@
 unsigned Person::m_cnt = 0;
 
 
-double inter_arrival_time_lambda;
 
 //
 // SimpleQueueSim definitions
 //
 void SimpleQueueSim::gen_arrival_event() {
-    auto interarrival_time = m_rand_arrival_time.rand_exp(inter_arrival_time_lambda);
+    auto interarrival_time = m_rand_arrival_time.rand_exp(m_inter_arrival_time_lambda);
     auto arrival_time = interarrival_time + current_time();
     add_event(new ArriveEvent(arrival_time, *this)); 
 }
@@ -45,8 +44,9 @@ void SimpleQueueSim::save_simulation(std::string save_file) {
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc;
   emitter << YAML::BeginMap;
-  emitter << YAML::Key << "service time seed"      << YAML::Value << m_rand_service_time.get_seed();
   emitter << YAML::Key << "interarrival time seed" << YAML::Value << m_rand_arrival_time.get_seed();
+  emitter << YAML::Key << "interarrival time lambda" << YAML::Value << m_inter_arrival_time_lambda;
+  emitter << YAML::Key << "service time seed"      << YAML::Value << m_rand_service_time.get_seed();
   emitter << YAML::Key << "total service time"     << YAML::Value << m_total_service_time;
   emitter << YAML::Key << "max simulation people"  << YAML::Value <<  m_max_people;
   emitter << YAML::Key << "simulated people"       << YAML::Value << m_num_simulated_person;
@@ -77,8 +77,8 @@ Event* SimpleQueueSim::event_factory(const std::string type, Time const occuure_
 }
 
 
-void SimpleQueueSim::load_simulation() {
-  std::ifstream fin(EventSimulator::save_file_name);
+void SimpleQueueSim::load_simulation(std::string load_file) {
+  std::ifstream fin(load_file);
   auto saved_all = YAML::LoadAllFromFile(EventSimulator::save_file_name);
 
   auto saved = saved_all[0];
@@ -91,6 +91,7 @@ void SimpleQueueSim::load_simulation() {
   saved = saved_all[1];
   m_rand_service_time.set_seed(saved["service time seed"].as<unsigned>());
   m_rand_arrival_time.set_seed(saved["interarrival time seed"].as<unsigned>());
+  m_inter_arrival_time_lambda = saved["interarrival time lambda"].as<Time>();
   m_total_service_time = saved["total service time"].as<Time>();
   m_max_people = saved["max simulation people"].as<unsigned>();
   m_num_simulated_person = saved["simulated people"].as<unsigned>();

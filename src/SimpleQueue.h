@@ -97,9 +97,9 @@ class Person
 class SimpleQueueSim: public EventSimulator
 {
   public:
-    SimpleQueueSim (Time max_sim_time = 1000000, int queue_depth=1000): 
-      EventSimulator(max_sim_time),
-      m_queue_depth(queue_depth)
+    SimpleQueueSim (): 
+      EventSimulator(),
+      m_queue_depth(1000)
   {
     gen_arrival_event();
     person_sys_time.open("person_sys_time.txt");
@@ -110,7 +110,14 @@ class SimpleQueueSim: public EventSimulator
     person_sys_time.close();
   }
 
-  
+  void set_max_sim_time(Time t) {
+    EventSimulator::set_max_sim_time(t);
+  }
+
+  void set_queue_depth(unsigned d) {
+    m_queue_depth = d;
+  }
+
   void set_max_people(unsigned num) {
     m_max_people = num;
   }
@@ -118,6 +125,18 @@ class SimpleQueueSim: public EventSimulator
   void set_seed(unsigned seed) {
     m_rand_arrival_time.set_seed(seed);
     m_rand_service_time = m_rand_arrival_time.rand_stream();
+  }
+
+  void set_interarrival_rand_seed(unsigned seed) {
+    m_rand_arrival_time.set_seed(seed);
+  }
+
+  void set_service_rand_seed(unsigned seed) {
+    m_rand_service_time.set_seed(seed);
+  }
+
+  void set_interarrival_lambda(const Time lambda) {
+    m_inter_arrival_time_lambda = lambda; 
   }
 
   unsigned get_seed() {
@@ -147,7 +166,7 @@ class SimpleQueueSim: public EventSimulator
   void put_in_queue(Person p);
   
   virtual void save_simulation(std::string save_file=EventSimulator::save_file_name);
-  virtual void load_simulation();
+  virtual void load_simulation(std::string load_file=EventSimulator::save_file_name);
 
 private:
   class ArriveEvent;
@@ -160,11 +179,11 @@ private:
   Time m_total_service_time;
   unsigned m_max_people;
   unsigned m_num_simulated_person;
+  Time m_inter_arrival_time_lambda;
 
   std::ofstream person_sys_time;
 };
 
-extern double inter_arrival_time_lambda;
 
 class SimpleQueueSim::ArriveEvent: public Event
 {

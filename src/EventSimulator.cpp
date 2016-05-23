@@ -55,8 +55,8 @@ void EventSimulator::save_simulation(std::string save_file) {
 }
 
 
-void EventSimulator::load_simulation() {
-  YAML::Node saved = YAML::LoadFile(EventSimulator::save_file_name);
+void EventSimulator::load_simulation(std::string load_file) {
+  YAML::Node saved = YAML::LoadFile(load_file);
   m_time = saved["time"].as<Time>();
   m_max_sim_time = saved["max simulation time"].as<Time>();
   std::cout << "m_time: " << m_time << std::endl;

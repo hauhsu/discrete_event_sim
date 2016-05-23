@@ -12,13 +12,17 @@ std::function<bool (const Event*, const Event*)> compare;
 class EventSimulator
 {
 public:
-  EventSimulator (Time max_sim_time): 
+  EventSimulator (): 
     m_time(0), 
-    m_max_sim_time(max_sim_time),
+    m_max_sim_time(100000),
     m_event_queue(compare)
   {}
 
   virtual ~EventSimulator ();
+
+  void set_max_sim_time(Time t) {
+    m_max_sim_time = t;
+  }
 
   void run();
 
@@ -45,7 +49,7 @@ public:
    */
   static std::string save_file_name;
   virtual void save_simulation(std::string save_file=save_file_name);
-  virtual void load_simulation();
+  virtual void load_simulation(std::string load_file=save_file_name);
 
 private:
   Time m_time;
