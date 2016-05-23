@@ -1,0 +1,6 @@
+max-number-of-sim-people=10 
+mean-of-interarrival-time=8
+init-seed=3
+interarrival-time-rand-seed=1
+service-time-rand-seed=2
+waiting-queue-depth=1000
