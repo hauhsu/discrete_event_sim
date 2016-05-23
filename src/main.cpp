@@ -27,5 +27,7 @@ int main(int argc, char *argv[])
   sqs.save_simulation();
   std::ofstream seed_file("next_seed.txt");
   seed_file<< sqs.get_seed() << std::endl;
+  sqs.load_simulation();
+  sqs.save_simulation("re_save.yaml");
   return 0;
 }

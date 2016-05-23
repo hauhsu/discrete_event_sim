@@ -44,7 +44,7 @@ public:
    * Save/load simulation
    */
   static std::string save_file_name;
-  virtual void save_simulation();
+  virtual void save_simulation(std::string save_file=save_file_name);
   virtual void load_simulation();
 
 private:

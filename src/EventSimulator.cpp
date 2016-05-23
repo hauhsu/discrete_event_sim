@@ -2,7 +2,7 @@
 #include "yaml-cpp/yaml.h"
 
 
-std::string EventSimulator::save_file_name("save.txt");
+std::string EventSimulator::save_file_name("save.yaml");
 
 EventSimulator::~EventSimulator() {
   while (m_event_queue.size() != 0) {
@@ -23,15 +23,14 @@ void EventSimulator::run () {
 }
 
 
-void EventSimulator::save_simulation() {
+void EventSimulator::save_simulation(std::string save_file) {
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc;
   emitter << YAML::BeginMap;
   emitter << YAML::Key << "time" << YAML::Value << m_time;
   emitter << YAML::Key << "max simulation time" << YAML::Value << m_max_sim_time ;
-  emitter << YAML::Key << "event queue size"<< YAML::Value << m_event_queue.size();
-  emitter << YAML::Key << "events" << YAML::Value;
 
+  emitter << YAML::Key << "events" << YAML::Value;
   emitter << YAML::BeginSeq;
   auto q_size = m_event_queue.size();
   //pop events from priority queue and put into a vector
@@ -50,12 +49,15 @@ void EventSimulator::save_simulation() {
   emitter << YAML::EndMap;
   emitter << YAML::EndDoc;
 
-  std::ofstream save_file("save.txt");
-  save_file << emitter.c_str();
+  std::ofstream save(save_file);
+  save << emitter.c_str();
 
 }
 
 
 void EventSimulator::load_simulation() {
-
+  YAML::Node saved = YAML::LoadFile(EventSimulator::save_file_name);
+  m_time = saved["time"].as<Time>();
+  m_max_sim_time = saved["max simulation time"].as<Time>();
+  std::cout << "m_time: " << m_time << std::endl;
 }

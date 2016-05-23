@@ -20,6 +20,17 @@ class Person
       m_arrival_time(0),
       m_leave_time(0)
     {m_cnt ++;}
+
+    Person(
+        unsigned id,
+        Time arrival_time, 
+        Time service_time, 
+        Time leave_time): 
+      m_id(id),
+      m_serve_time(service_time),
+      m_arrival_time(arrival_time),
+      m_leave_time(leave_time)
+    {}
     
     Person(const Person &p): 
       m_id( p.id() ), 
@@ -69,8 +80,8 @@ class Person
       emitter << YAML::EndMap;
     }
 
-    static unsigned get_m_cnt() {return m_cnt;}
-    void set_m_cnt(unsigned cnt) {m_cnt = cnt;}
+    static unsigned get_cnt() {return m_cnt;}
+    static void set_cnt(unsigned cnt) {m_cnt = cnt;}
 
   private:
     unsigned m_id;
@@ -135,12 +146,13 @@ class SimpleQueueSim: public EventSimulator
 
   void put_in_queue(Person p);
   
-  virtual void save_simulation();
+  virtual void save_simulation(std::string save_file=EventSimulator::save_file_name);
   virtual void load_simulation();
 
 private:
   class ArriveEvent;
   class LeaveEvent;
+  Event* event_factory(const std::string type, const Time occuure_time);
   std::queue<Person> m_waiting_queue;
   unsigned m_queue_depth;
   Rand m_rand_arrival_time;
@@ -151,14 +163,14 @@ private:
 
   std::ofstream person_sys_time;
 };
-extern double inter_arrival_time_lambda;
 
+extern double inter_arrival_time_lambda;
 
 class SimpleQueueSim::ArriveEvent: public Event
 {
   public:
     ArriveEvent (Time t, SimpleQueueSim &s): 
-      Event(t, "ArrivalEvent"), 
+      Event(t, "ArriveEvent"), 
       m_parent_sim(s) 
   { 
     std::cout << "Next person will arrive at: " << t << std::endl;
