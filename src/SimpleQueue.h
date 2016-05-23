@@ -101,7 +101,6 @@ class SimpleQueueSim: public EventSimulator
       EventSimulator(),
       m_queue_depth(1000)
   {
-    gen_arrival_event();
     person_sys_time.open("person_sys_time.txt");
   }
 
@@ -135,7 +134,7 @@ class SimpleQueueSim: public EventSimulator
     m_rand_service_time.set_seed(seed);
   }
 
-  void set_interarrival_lambda(const Time lambda) {
+  void set_interarrival_lambda(const double lambda) {
     m_inter_arrival_time_lambda = lambda; 
   }
 
@@ -143,7 +142,12 @@ class SimpleQueueSim: public EventSimulator
     return m_rand_arrival_time.get_seed();
   }
 
-  virtual bool terminat() {
+  virtual void run() override {
+    gen_arrival_event();
+    EventSimulator::run();
+  }
+
+  virtual bool terminat() override{
     return EventSimulator::terminat() or  m_num_simulated_person >= m_max_people;
   }
 
@@ -165,8 +169,10 @@ class SimpleQueueSim: public EventSimulator
 
   void put_in_queue(Person p);
   
-  virtual void save_simulation(std::string save_file=EventSimulator::save_file_name);
-  virtual void load_simulation(std::string load_file=EventSimulator::save_file_name);
+  virtual void 
+    save_simulation(std::string save_file=EventSimulator::save_file_name) override ;
+  virtual void 
+    load_simulation(std::string load_file=EventSimulator::save_file_name) override ;
 
 private:
   class ArriveEvent;

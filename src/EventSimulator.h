@@ -24,7 +24,7 @@ public:
     m_max_sim_time = t;
   }
 
-  void run();
+  virtual void run();
 
   virtual bool terminat() {
     return (m_event_queue.empty()) or (m_time > m_max_sim_time);

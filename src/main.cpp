@@ -80,42 +80,45 @@ int main(int argc, char *argv[])
   else {
     if (vm.count("max-number-of-sim-people")) {
       max_people = vm["max-number-of-sim-people"].as<unsigned>();
-      sqs.set_max_people(max_people);
-      std::cout << "Maximum number of simulated people: " << max_people << std::endl;
     }
     if (vm.count("max-time-of-simulation")) {
       max_sim_time = vm["max-time-of-simulation"].as<Time>();
-      sqs.set_max_sim_time(max_sim_time);
-      std::cout << "Maximum simulation time: " << max_sim_time << std::endl;
     }
     if (vm.count("mean-of-interarrival-time")) {
       interarrival_time_mean = vm["mean-of-interarrival-time"].as<Time>();
-      sqs.set_interarrival_lambda(1.0 / interarrival_time_mean);
-      std::cout << "Mean of interarrival time: " << interarrival_time_mean << std::endl;
     }
 
     if (vm.count("init-seed")) {
       init_seed = vm["init-seed"].as<unsigned>();
-      sqs.set_seed(init_seed);
-      std::cout << "Init seed: " << init_seed << std::endl;
     } 
     else if (vm.count("interarrival-time-rand-seed") && vm.count("service-time-rand-seed")) {
       interarrival_rand_seed = vm["interarrival-time-rand-seed"].as<unsigned>();
-      sqs.set_interarrival_rand_seed(interarrival_rand_seed);
-      std::cout << "Interarrival time rand seed: " << interarrival_rand_seed << std::endl;
 
       service_time_rand_seed = vm["service-time-rand-seed"].as<unsigned>();
-      sqs.set_service_rand_seed(service_time_rand_seed);
-      std::cout << "Service time rand seed: " << service_time_rand_seed << std::endl;
     } else {
-      sqs.set_seed(init_seed);
-      std::cout << "Seeds not set, use default init seed: " << init_seed << std::endl;
     }
 
     if (vm.count("waiting-queue-depth")) {
       waiting_queue_depth = vm["waiting-queue-depth"].as<unsigned>();
-      sqs.set_queue_depth(waiting_queue_depth);
-      std::cout << "Depth of waiting queue: " << waiting_queue_depth << std::endl;
+    }
+
+    std::cout << "Maximum number of simulated people: " << max_people << std::endl;
+    std::cout << "Maximum simulation time: " << max_sim_time << std::endl;
+    std::cout << "Mean of interarrival time: " << interarrival_time_mean << std::endl;
+    std::cout << "Depth of waiting queue: " << waiting_queue_depth << std::endl;
+
+    sqs.set_max_people(max_people);
+    sqs.set_max_sim_time(max_sim_time);
+    sqs.set_interarrival_lambda(1.0 / interarrival_time_mean);
+    sqs.set_queue_depth(waiting_queue_depth);
+    if (vm.count("interarrival-time-rand-seed") && vm.count("service-time-rand-seed")) {
+      std::cout << "Interarrival time rand seed: " << interarrival_rand_seed << std::endl;
+      sqs.set_interarrival_rand_seed(interarrival_rand_seed);
+      sqs.set_service_rand_seed(service_time_rand_seed);
+    }
+    else {
+      std::cout << "Init seed: " << init_seed << std::endl;
+      sqs.set_seed(init_seed);
     }
   }
   std::cout << "--------------------------------------\n" << std::endl;
