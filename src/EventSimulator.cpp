@@ -23,6 +23,7 @@ void EventSimulator::run () {
 }
 
 
+
 void EventSimulator::save_simulation(std::string save_file) {
   YAML::Emitter emitter;
   emitter << YAML::BeginDoc;

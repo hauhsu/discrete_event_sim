@@ -1,11 +1,14 @@
 import yaml
 from subprocess import call
+from statistics import mean, stdev, variance
+from scipy.stats import t
 
-def run_mm1q(people='10', interarrival_mean='11', **args):
 
-    output = None
-    if 'verbose' in args and args['verbose'] == 'False':
-        output = open('/dev/null', 'w') 
+def run_mm1q(people=10, interarrival_mean=11, **args):
+
+    output = open('/dev/null', 'w') 
+    if 'verbose' in args and args['verbose'] == True:
+        output = None
         
 
     if 'i_seed' in args:
@@ -14,10 +17,11 @@ def run_mm1q(people='10', interarrival_mean='11', **args):
         if 's_seed' in args:
             service_time_rand_seed = args['s_seed']
             call(['../build/MM1QueueSimulator', 
-                  '--max-number-of-sim-people', people, 
-                  '--mean-of-interarrival-time', interarrival_mean,
-                  '--interarrival-time-rand-seed', interarrival_time_rand_seed,
-                  '--service-time-rand-seed', service_time_rand_seed],
+                  '--max-number-of-sim-people', str(people), 
+                  '--mean-of-interarrival-time', str(interarrival_mean),
+                  '--interarrival-time-rand-seed',
+                    str(interarrival_time_rand_seed),
+                  '--service-time-rand-seed', str(service_time_rand_seed)],
                 stdout=output)
         else:
             raise RuntimeError('i_seed and s_seed should both be provided.')
@@ -26,15 +30,15 @@ def run_mm1q(people='10', interarrival_mean='11', **args):
         init_seed = args['init_seed']
 
         call(['../build/MM1QueueSimulator', 
-              '--max-number-of-sim-people', people, 
-              '--mean-of-interarrival-time', interarrival_mean,
+              '--max-number-of-sim-people', str(people), 
+              '--mean-of-interarrival-time', str(interarrival_mean),
               '--init-seed', init_seed],
             stdout=output)
 
     else:
         call(['../build/MM1QueueSimulator', 
-              '--max-number-of-sim-people', people, 
-              '--mean-of-interarrival-time', interarrival_mean],
+              '--max-number-of-sim-people', str(people), 
+              '--mean-of-interarrival-time', str(interarrival_mean)],
             stdout=output)
 
 def run_mm1q_load(save_file, add_people, verbose=False):
@@ -44,9 +48,10 @@ def run_mm1q_load(save_file, add_people, verbose=False):
         output = open('/dev/null', 'w') 
 
 
+    print('Reload, add people: {}'.format(add_people))
     call(['../build/MM1QueueSimulator', 
           '--load', save_file,
-          '--add-sim-people', add_people],
+          '--add-sim-people', str(add_people)],
           stdout = output)
 
 
@@ -66,3 +71,11 @@ def get_sim_result(bias=0):
            yi.append(float(line)) 
 
     return yi[bias:]
+
+def confidence_interval_half_width(data, confidence=0.95):
+    n = len(data)
+    standard_deviation = stdev(data)
+    avg = mean(data)
+
+    return t.interval(confidence, n-1)[1] * (standard_deviation / n**0.5)
+

@@ -3,19 +3,15 @@ from subprocess import call
 from statistics import mean, stdev, variance
 import matplotlib.pyplot as plt
 
+from mm1q import *
 
-def confidence_interval_half_width(data, confidence=0.95):
-    n = len(data)
-    standard_deviation = stdev(data)
-    avg = mean(data)
 
-    return t.interval(confidence, n-1)[1] * (standard_deviation / n**0.5)
 
 
 def ci_with_precision(l=12, confidence=0.95, precision=0.9):
-    global interarrival_mean
-    interarrival_mean = l
-    run_mm1('30')
+
+    sim_people = 300
+    run_mm1q(people = sim_people, interarrival_mean = l)
     data = get_sim_result()
 
     Yi_average = mean(data)
@@ -28,7 +24,9 @@ def ci_with_precision(l=12, confidence=0.95, precision=0.9):
         yi_average_list = [mean(data)]
 
         while epsilon > (1-precision):
-            run_mm1('300')
+            i_seed, s_seed = get_seeds_from_save('save.yaml')
+            run_mm1q(people = sim_people, interarrival_mean = l, 
+                    i_seed = i_seed, s_seed = s_seed)
             data = get_sim_result()
             yi_average_list.append( mean(data) )
             Yi_average = mean(yi_average_list)

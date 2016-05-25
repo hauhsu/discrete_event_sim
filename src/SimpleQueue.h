@@ -99,7 +99,8 @@ class SimpleQueueSim: public EventSimulator
   public:
     SimpleQueueSim (): 
       EventSimulator(),
-      m_queue_depth(1000)
+      m_queue_depth(1000),
+      m_load(false)
   {
     person_sys_time.open("person_sys_time.txt");
   }
@@ -147,7 +148,9 @@ class SimpleQueueSim: public EventSimulator
   }
 
   virtual void run() override {
-    gen_arrival_event();
+    if (not m_load) {
+      gen_arrival_event();
+    }
     EventSimulator::run();
   }
 
@@ -190,6 +193,8 @@ private:
   unsigned m_max_people;
   unsigned m_num_simulated_person;
   Time m_inter_arrival_time_lambda;
+
+  bool m_load;
 
   std::ofstream person_sys_time;
 };

@@ -1,5 +1,5 @@
 from statistics import mean, stdev, variance
-from analysis import *
+from mm1q import *
 
 import matplotlib.pyplot as plt
 
@@ -7,8 +7,11 @@ def main():
     max_sim_people = 5000
     replication = 30
     data = []
+    i_seed = 1
+    s_seed = 9
     for i in range(replication):
-        run_mm1(str(max_sim_people))
+        run_mm1q(max_sim_people, i_seed=i_seed, s_seed=s_seed)
+        i_seed, s_seed = get_seeds_from_save('save.yaml')
         data.append(get_sim_result())
 
 

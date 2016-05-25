@@ -54,12 +54,12 @@ int main(int argc, char *argv[])
  
   //Default config values 
   auto max_people = 5;
-  Time max_sim_time = 1000;
+  Time max_sim_time = 100000;
   unsigned init_seed = 10;
   unsigned interarrival_rand_seed = 0;
   unsigned service_time_rand_seed = 0;
   auto interarrival_time_mean = 11.0;
-  unsigned waiting_queue_depth = 1000;
+  unsigned waiting_queue_depth = 5000;
   std::string load_file("save.yaml");
 
   if (vm.count("help")) {

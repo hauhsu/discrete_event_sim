@@ -78,6 +78,7 @@ Event* SimpleQueueSim::event_factory(const std::string type, Time const occuure_
 
 
 void SimpleQueueSim::load_simulation(std::string load_file) {
+  m_load = true;
   std::ifstream fin(load_file);
   auto saved_all = YAML::LoadAllFromFile(EventSimulator::save_file_name);
 
